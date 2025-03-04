@@ -2,7 +2,6 @@
   hosts: all
   become: true  # Run as sudo
   tasks:
-
     - name: Update APT package cache
       apt:
         update_cache: yes
