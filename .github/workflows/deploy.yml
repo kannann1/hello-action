@@ -30,6 +30,7 @@ jobs:
         working-directory: terraform
 
       - name: Apply Terraform (Provision EC2)
+        id: get-ip
         run: |
           terraform apply -auto-approve
           RAW_IP=$(terraform output -raw instance_public_ip | tr -d '\r' | tr -d '\n')
