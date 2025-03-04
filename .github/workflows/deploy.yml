@@ -63,7 +63,7 @@ jobs:
         fetch-depth: 0
     - name: Debug SSH Connection
       run: |
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+        echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
         chmod 600 private_key.pem
         export SSH_PRIVATE_KEY_PATH=$PWD/private_key.pem
         ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY_PATH ubuntu@${{ env.EC2_IP }} "echo SSH Connection Successful"
