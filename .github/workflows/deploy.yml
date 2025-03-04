@@ -74,7 +74,7 @@ jobs:
         cat $GITHUB_OUTPUT
         echo "[hello_world]" > ansible/inventory.ini
         echo "${{ env.EC2_IP }}"
-        echo "${{ env.EC2_IP }} ansible_user=${{ secrets.EC2_USER }} ansible_ssh_private_key_file=private_key.pem" >> ansible/inventory.ini
+        echo "${{ env.EC2_IP }} ansible_user=${{ secrets.EC2_USER }} ansible_ssh_private_key_file=private_key.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> ansible/inventory.ini
 
     - name: Run Ansible Playbook
       run: ansible-playbook -i ansible/inventory.ini ansible/setup.yaml
