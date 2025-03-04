@@ -59,8 +59,10 @@ jobs:
 
     - name: Create SSH Private Key File
       run: |
-        echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
         chmod 600 private_key.pem
+        export SSH_PRIVATE_KEY_PATH=$PWD/private_key.pem
+        echo "SSH_PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV
 
     - name: Checkout Repository
       uses: actions/checkout@v3
@@ -74,7 +76,7 @@ jobs:
         cat $GITHUB_OUTPUT
         echo "[hello_world]" > ansible/inventory.ini
         echo "${{ env.EC2_IP }}"
-        echo "${{ env.EC2_IP }} ansible_user=${{ secrets.EC2_USER }} ansible_ssh_private_key_file=private_key.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> ansible/inventory.ini
+        echo "${{ env.EC2_IP }} ansible_user=${{ secrets.EC2_USER }} ansible_ssh_private_key_file=${{ env.SSH_PRIVATE_KEY_PATH }} ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> ansible/inventory.ini
 
     - name: Run Ansible Playbook
       run: ansible-playbook -i ansible/inventory.ini ansible/setup.yaml
