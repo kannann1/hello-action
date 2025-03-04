@@ -40,10 +40,9 @@ jobs:
             echo "ERROR: Extracted IP is empty!"
             exit 1
           fi
-          echo "::set-output name=EC2_IP::$CLEAN_IP"
-          echo "EC2_IP=$CLEAN_IP" >> $GITHUB_ENV
-          echo "GITHUB_ENV=$GITHUB_ENV"
-          cat $GITHUB_ENV
+          echo "EC2_IP=$CLEAN_IP" >> $GITHUB_OUTPUT
+          echo "GITHUB_ENV=$GITHUB_OUTPUT"
+          cat $GITHUB_OUTPUT
           
         working-directory: terraform
 
@@ -68,8 +67,8 @@ jobs:
     - name: Generate Ansible Inventory
       run: |
         mkdir -p ansible
-        echo "GITHUB_ENV=$GITHUB_ENV"
-        cat $GITHUB_ENV
+        echo "GITHUB_ENV=$GITHUB_OUTPUT"
+        cat $GITHUB_OUTPUT
         echo "[hello_world]" > ansible/inventory.ini
         echo "${{ env.EC2_IP }}"
         echo "${{ env.EC2_IP }} ansible_user=${{ secrets.EC2_USER }} ansible_ssh_private_key_file=private_key.pem" >> ansible/inventory.ini
