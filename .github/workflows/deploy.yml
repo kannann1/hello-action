@@ -102,6 +102,7 @@ jobs:
         run: |
           cd app
           npm install
+          echo "EC2_IP=${{ env.EC2_IP }}"
 
       - name: Archive Project Files
         run: tar -cvf app.tar .
