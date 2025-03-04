@@ -43,5 +43,5 @@ jobs:
             cd /home/${{ secrets.EC2_USER }}
             tar -xvf app.tar
             npm install
-            pm2 restart server.js || pm2 start server.js
+            npm run start
 
