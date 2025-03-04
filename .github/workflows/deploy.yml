@@ -52,7 +52,7 @@ jobs:
     needs: provision
     runs-on: ubuntu-latest
     env:
-      EC2_IP: ${{ needs.terraform.outputs.EC2_IP }} 
+      EC2_IP: ${{ needs.provision.outputs.EC2_IP }} 
     steps:
     - name: Install Ansible
       run: sudo apt update && sudo apt install -y ansible
