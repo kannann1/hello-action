@@ -71,7 +71,7 @@ jobs:
     - name: Generate Ansible Inventory
       run: |
         mkdir -p ansible
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+        echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
         chmod 600 private_key.pem
         export SSH_PRIVATE_KEY_PATH=$PWD/private_key.pem
         echo "SSH_PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV
