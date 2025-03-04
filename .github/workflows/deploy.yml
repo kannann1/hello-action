@@ -39,6 +39,7 @@ jobs:
             exit 1
           fi
           echo "EC2_IP=$CLEAN_IP" >> $GITHUB_ENV
+          echo "GITHUB_ENV=$GITHUB_ENV"
           
         working-directory: terraform
 
@@ -63,6 +64,7 @@ jobs:
     - name: Generate Ansible Inventory
       run: |
         mkdir -p ansible
+        echo "GITHUB_ENV=$GITHUB_ENV"
         echo "[hello_world]" > ansible/inventory.ini
         echo "${{ env.EC2_IP }}"
         echo "${{ env.EC2_IP }} ansible_user=${{ secrets.EC2_USER }} ansible_ssh_private_key_file=private_key.pem" >> ansible/inventory.ini
