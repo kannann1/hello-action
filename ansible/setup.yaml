@@ -1,0 +1,18 @@
+- name: Setup EC2 for Hello World App
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Node.js and npm
+      yum:
+        name: nodejs
+        state: present
+
+    - name: Install PM2
+      npm:
+        name: pm2
+        global: yes
+
+    - name: Start PM2 on Reboot
+      shell: |
+        pm2 startup systemd
+        pm2 save

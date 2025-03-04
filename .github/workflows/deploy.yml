@@ -6,6 +6,45 @@ on:
       - main
 
 jobs:
+  provision:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Initialize Terraform
+        run: terraform init
+        working-directory: terraform
+
+      - name: Apply Terraform (Provision EC2)
+        run: terraform apply -auto-approve
+        working-directory: terraform
+
+      - name: Get EC2 Public IP
+        run: echo "EC2_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
+  configure:
+    needs: provision
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install Ansible
+      run: sudo apt update && sudo apt install -y ansible
+
+    - name: Create SSH Private Key File
+      run: |
+        echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
+        chmod 600 private_key.pem
+
+    - name: Generate Ansible Inventory
+      run: |
+        echo "[hello_world]" > ansible/inventory.ini
+        echo "${{ secrets.EC2_USER }}@${{ env.EC2_IP }} ansible_ssh_private_key_file=private_key.pem" >> ansible/inventory.ini
+
+    - name: Run Ansible Playbook
+      run: ansible-playbook -i ansible/inventory.ini ansible/setup.yml
+
   deploy:
     runs-on: ubuntu-latest
 
@@ -27,7 +66,7 @@ jobs:
       - name: Copy Files to EC2
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.EC2_HOST }}
+          host: ${{ secrets.EC2_IP }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "app.tar"
@@ -36,12 +75,13 @@ jobs:
       - name: Deploy Application on EC2
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_HOST }}
+          host: ${{ secrets.EC2_IP }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/${{ secrets.EC2_USER }}
             tar -xvf app.tar
+            cd app
             npm install
             pm2 restart server.js || pm2 start server.js
 
