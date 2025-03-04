@@ -1,18 +1,67 @@
-- name: Setup EC2 for Hello World App
+- name: Configure Ubuntu EC2 Instance
   hosts: all
-  become: yes
+  become: true  # Run as sudo
   tasks:
-    - name: Install Node.js and npm
-      yum:
-        name: nodejs
+
+    - name: Update APT package cache
+      apt:
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - curl
+          - git
+          - unzip
+          - python3-pip
+          - python3-venv
         state: present
 
-    - name: Install PM2
+    - name: Install Node.js and npm
+      shell: |
+        curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+        apt-get install -y nodejs
+      args:
+        executable: /bin/bash
+
+    - name: Verify Node.js and npm installation
+      command: node -v
+      register: node_version
+      changed_when: false
+
+    - debug:
+        msg: "Node.js version: {{ node_version.stdout }}"
+
+    - name: Install PM2 globally
       npm:
         name: pm2
         global: yes
 
-    - name: Start PM2 on Reboot
-      shell: |
-        pm2 startup systemd
-        pm2 save
+    - name: Create a deployment directory
+      file:
+        path: /opt/myapp
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Copy application files
+      copy:
+        src: ../app
+        dest: /opt/myapp
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Start application with PM2
+      command: pm2 start /opt/myapp/index.js --name "myapp"
+      args:
+        chdir: /opt/myapp
+      become: yes
+      become_user: ubuntu
+
+    - name: Save PM2 process list
+      command: pm2 save
+
+    - name: Configure PM2 to start on reboot
+      command: pm2 startup systemd
