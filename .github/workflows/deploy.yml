@@ -30,7 +30,7 @@ jobs:
       - name: Apply Terraform (Provision EC2)
         run: |
           terraform apply -auto-approve
-          RAW_IP=$(terraform output -raw public_ip | tr -d '\r' | tr -d '\n')
+          RAW_IP=$(terraform output -raw instance_public_ip | tr -d '\r' | tr -d '\n')
           echo "RAW_IP=$RAW_IP"
           CLEAN_IP=$(echo $RAW_IP | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+')
           echo "CLEAN_IP=$CLEAN_IP"
