@@ -37,29 +37,6 @@
         name: pm2
         global: yes
 
-    - name: Create a deployment directory
-      file:
-        path: /opt/myapp
-        state: directory
-        owner: ubuntu
-        group: ubuntu
-        mode: '0755'
-
-    - name: Copy application files
-      copy:
-        src: ../app
-        dest: /opt/myapp
-        owner: ubuntu
-        group: ubuntu
-        mode: '0755'
-
-    - name: Start application with PM2
-      command: pm2 start /opt/myapp/index.js --name "myapp"
-      args:
-        chdir: /opt/myapp
-      become: yes
-      become_user: ubuntu
-
     - name: Save PM2 process list
       command: pm2 save
 
