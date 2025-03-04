@@ -98,7 +98,9 @@ jobs:
           node-version: '18'
 
       - name: Install Dependencies
-        run: npm install
+        run: |
+          cd app
+          npm install
 
       - name: Archive Project Files
         run: tar -cvf app.tar .
